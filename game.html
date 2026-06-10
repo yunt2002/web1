@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>갬블링 게임</title>
+    <style>
+        /* 전체 컨테이너 스타일 */
+        .game-box {
+            width: 380px;
+            border: 1px solid #ccc;
+            padding: 15px;
+            font-family: 'Malgun Gothic', '맑은 고딕', sans-serif;
+        }
+
+        h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        p {
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        /* 숫자 박스 디자인 */
+        .num-container {
+            margin-bottom: 20px;
+        }
+
+        .num {
+            display: inline-block;
+            width: 60px;
+            height: 70px;
+            line-height: 70px;
+            text-align: center;
+            font-size: 45px;
+            font-style: italic;
+            color: #0000cc; /* 파란색 계열 */
+            border: 1px solid #a0a0ff;
+            background-color: #fcfcfc;
+            margin-right: 15px;
+            cursor: pointer;
+            user-select: none; /* 클릭 시 텍스트 드래그 방지 */
+        }
+
+        /* 결과 메시지 디자인 */
+        #msg {
+            color: #cc6699; /* 핑크/자주색 계열 */
+            font-style: italic;
+            font-size: 16px;
+            cursor: pointer;
+            min-height: 24px; /* 메시지가 없을 때도 공간 유지 */
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-box">
+    <h3>갬블링 게임</h3>
+    <p>각 숫자를 클릭하면 0에서 2사이의 난수로 바뀝니다. 모두 같은 수가 나오면 승리합니다.</p>
+    
+    <div class="num-container">
+        <span class="num" id="n0" onclick="changeNum(0, this)">0</span>
+        <span class="num" id="n1" onclick="changeNum(1, this)">0</span>
+        <span class="num" id="n2" onclick="changeNum(2, this)">0</span>
+    </div>
+    
+    <div id="msg" onclick="resetGame()"></div>
+</div>
+
+<script>
+    // 각 숫자가 클릭되었는지 확인하는 배열
+    let clicked = [false, false, false];
+    let isGameOver = false;
+
+    // 숫자 클릭 시 실행되는 함수
+    function changeNum(index, obj) {
+        // 이미 게임이 끝났다면 클릭을 무시
+        if (isGameOver) return; 
+
+        // 0, 1, 2 중 랜덤한 숫자 생성
+        let randomNum = Math.floor(Math.random() * 3);
+        obj.innerHTML = randomNum;
+        
+        // 해당 박스가 클릭되었음을 기록
+        clicked[index] = true;
+
+        // 세 개의 숫자가 모두 최소 한 번씩 클릭되었는지 확인 (마지막 숫자 클릭 시점)
+        if (clicked[0] && clicked[1] && clicked[2]) {
+            checkResult();
+        }
+    }
+
+    // 승패를 확인하는 함수
+    function checkResult() {
+        isGameOver = true; // 게임 종료 상태로 변경
+        
+        let n0 = document.getElementById("n0").innerHTML;
+        let n1 = document.getElementById("n1").innerHTML;
+        let n2 = document.getElementById("n2").innerHTML;
+        let msg = document.getElementById("msg");
+
+        // 3개의 숫자가 모두 같은지 비교
+        if (n0 === n1 && n1 === n2) {
+            msg.innerHTML = "Success(click here to do again)";
+        } else {
+            msg.innerHTML = "fail(click here to do again)";
+        }
+    }
+
+    // 게임을 초기 상태로 되돌리는 함수 (메시지 클릭 시 실행)
+    function resetGame() {
+        // 게임이 진행 중일 때는 리셋 클릭을 무시
+        if (!isGameOver) return; 
+
+        document.getElementById("n0").innerHTML = "0";
+        document.getElementById("n1").innerHTML = "0";
+        document.getElementById("n2").innerHTML = "0";
+        document.getElementById("msg").innerHTML = "";
+        
+        // 상태 변수 초기화
+        clicked = [false, false, false];
+        isGameOver = false;
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,70 @@
+/* 전체 레이아웃의 너비를 잡아줍니다 */
+body {
+    width: 600px;
+    font-family: 'Malgun Gothic', sans-serif;
+    margin: 20px auto; /* 가운데 정렬 */
+}
+
+/* 제목 스타일 */
+h1 {
+    text-align: center;
+    color: #a52a2a; /* 갈색/짙은 붉은색 */
+}
+
+/* 설명 문구 스타일 */
+header p {
+    text-align: center;
+    font-size: 14px;
+    color: #333;
+}
+
+/* 구분선 스타일 */
+hr {
+    border: 1px solid #ccc;
+    margin-bottom: 20px;
+}
+
+/* 핑크색 배경의 폼 상자 스타일 */
+.form-box {
+    background-color: pink;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+/* 각 입력 줄의 여백 설정 */
+.row {
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+/* 보라색 강조 라벨 (학년, 성별 등) 스타일 */
+.title {
+    color: #800080; /* 보라색 */
+    font-weight: bold;
+    display: inline-block;
+    width: 120px; /* 라벨 너비를 맞춰 정렬 */
+}
+
+/* 라디오 버튼과 체크박스 간격 */
+label {
+    margin-right: 10px;
+}
+
+/* 텍스트 에어리어 스타일 및 정렬 */
+textarea {
+    vertical-align: text-bottom; /* 이미지처럼 라벨 문구를 아래쪽으로 맞춤 */
+}
+
+.message-title {
+    vertical-align: bottom;
+}
+
+/* 하단 카피라이트 스타일 */
+footer {
+    background-color: #f6c867; /* 노란색/주황색 계열 */
+    padding: 5px 15px;
+    border-radius: 20px; /* 둥근 모서리 */
+    font-style: italic; /* 기울임꼴 */
+    font-size: 14px;
+    color: #333;
+}

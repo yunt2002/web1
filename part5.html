@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>CSS3 동적 변화 예시</title>
+    <style>
+        /* 기본 레이아웃 설정 */
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 60px;
+            padding: 50px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .example-section {
+            text-align: center;
+        }
+
+        /* =========================================
+           1. Transition과 Transform을 활용한 버튼
+           ========================================= */
+        .hover-btn {
+            padding: 15px 30px;
+            font-size: 18px;
+            color: white;
+            background-color: #3498db;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            
+            /* 핵심: 모든 속성(all)의 변화를 0.3초 동안 부드럽게(ease) 진행 */
+            transition: all 0.3s ease; 
+        }
+
+        .hover-btn:hover {
+            background-color: #2980b9;
+            /* 핵심: 위로 5px 이동(translateY)하고 크기를 1.05배 확대(scale) */
+            transform: translateY(-5px) scale(1.05); 
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* =========================================
+           2. @keyframes를 활용한 무한 회전 스피너
+           ========================================= */
+        .spinner {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto;
+            border: 6px solid #e0e0e0;
+            border-top-color: #e74c3c;
+            border-radius: 50%;
+            
+            /* 핵심: 'spin'이라는 애니메이션을 1초 동안 일정한 속도(linear)로 무한 반복(infinite) */
+            animation: spin 1s linear infinite; 
+        }
+
+        /* 애니메이션 프레임 정의 */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* =========================================
+           3. 형태와 색상이 연속으로 변하는 박스
+           ========================================= */
+        .morph-box {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto;
+            background-color: #2ecc71;
+            border-radius: 10px;
+            
+            /* 핵심: 3초 동안 진행, 무한 반복하되, 끝까지 가면 다시 역방향으로 진행(alternate) */
+            animation: morph 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes morph {
+            0% {
+                background-color: #2ecc71;
+                border-radius: 10px;
+                transform: rotate(0deg);
+            }
+            50% {
+                background-color: #9b59b6;
+                border-radius: 50%; /* 중간 지점에서 원으로 변형 */
+                transform: rotate(180deg) scale(1.2); /* 회전하며 크기 확대 */
+            }
+            100% {
+                background-color: #f1c40f;
+                border-radius: 10px; /* 다시 사각형으로 복귀 */
+                transform: rotate(360deg) scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="example-section">
+        <h3>1. 마우스 오버 효과 (Transition + Transform)</h3>
+        <p>마우스를 올려보세요.</p>
+        <button class="hover-btn">클릭하세요</button>
+    </div>
+
+    <div class="example-section">
+        <h3>2. 로딩 스피너 (Animation + @keyframes)</h3>
+        <p>무한히 회전하는 로딩 애니메이션입니다.</p>
+        <div class="spinner"></div>
+    </div>
+
+    <div class="example-section">
+        <h3>3. 복합 애니메이션 (모양, 색상, 회전 변화)</h3>
+        <p>여러 단계(0%, 50%, 100%)를 거쳐 부드럽게 변형됩니다.</p>
+        <div class="morph-box"></div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>웹 달력</title>
+    <style>
+        .calendar { 
+            width: 320px; 
+            margin: 50px auto; 
+            border: 1px solid #ddd; 
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            overflow: hidden;
+        }
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background-color: #2196F3; 
+            color: white; 
+            padding: 15px; 
+        }
+        .header button { 
+            background: none; 
+            border: none; 
+            color: white; 
+            cursor: pointer; 
+            font-size: 18px; 
+            font-weight: bold;
+        }
+        .header button:hover { color: #bbdefb; }
+        .days { 
+            display: grid; 
+            grid-template-columns: repeat(7, 1fr); 
+            text-align: center; 
+            font-weight: bold; 
+            background-color: #f1f1f1; 
+            padding: 10px 0; 
+            font-size: 14px;
+        }
+        .days div:first-child { color: red; } /* 일요일 빨간색 */
+        .days div:last-child { color: blue; } /* 토요일 파란색 */
+        
+        .dates { 
+            display: grid; 
+            grid-template-columns: repeat(7, 1fr); 
+            text-align: center; 
+        }
+        .dates div { 
+            padding: 15px 0; 
+            border-bottom: 1px solid #eee; 
+            font-size: 14px;
+        }
+        .dates div:hover { background-color: #f9f9f9; cursor: pointer; }
+        .today { 
+            background-color: #2196F3; 
+            color: white; 
+            font-weight: bold; 
+            border-radius: 50%; 
+            width: 30px; 
+            height: 30px; 
+            line-height: 30px; 
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .empty { background-color: #fafafa; }
+    </style>
+</head>
+<body>
+
+<div class="calendar">
+    <div class="header">
+        <button onclick="prevMonth()">&#10094;</button>
+        <h3 id="month-year" style="margin: 0;"></h3>
+        <button onclick="nextMonth()">&#10095;</button>
+    </div>
+    <div class="days">
+        <div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div>
+    </div>
+    <div class="dates" id="dates"></div>
+</div>
+
+<script>
+    let currentDate = new Date();
+
+    function renderCalendar() {
+        const datesContainer = document.getElementById('dates');
+        const monthYearDisplay = document.getElementById('month-year');
+        datesContainer.innerHTML = '';
+
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+
+        // 상단 연도 및 월 표시
+        monthYearDisplay.textContent = `${year}년 ${month + 1}월`;
+
+        // 이번 달의 1일이 무슨 요일인지 (0: 일요일 ~ 6: 토요일)
+        const firstDay = new Date(year, month, 1).getDay();
+        // 이번 달이 며칠까지 있는지
+        const lastDate = new Date(year, month + 1, 0).getDate();
+        
+        const today = new Date();
+
+        // 1일 이전의 빈 칸 채우기
+        for (let i = 0; i < firstDay; i++) {
+            const emptyDiv = document.createElement('div');
+            emptyDiv.classList.add('empty');
+            datesContainer.appendChild(emptyDiv);
+        }
+
+        // 날짜 채우기
+        for (let i = 1; i <= lastDate; i++) {
+            const dateDiv = document.createElement('div');
+            const dateSpan = document.createElement('span');
+            dateSpan.textContent = i;
+            
+            // 오늘 날짜 강조 로직
+            if (year === today.getFullYear() && month === today.getMonth() && i === today.getDate()) {
+                dateSpan.classList.add('today');
+            }
+            
+            dateDiv.appendChild(dateSpan);
+            datesContainer.appendChild(dateDiv);
+        }
+    }
+
+    // 이전 달로 이동
+    function prevMonth() {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        renderCalendar();
+    }
+
+    // 다음 달로 이동
+    function nextMonth() {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        renderCalendar();
+    }
+
+    // 초기 달력 렌더링
+    renderCalendar();
+</script>
+
+</body>
+</html>

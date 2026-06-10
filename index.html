@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="예비 개발자 윤태훈의 포트폴리오 웹사이트입니다.">
+    <title>윤태훈 | Software Engineer</title>
+    
+    <!-- 웹 폰트 (Pretendard) & 아이콘 (FontAwesome) -->
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- CSS 변수 정의 --- */
+        :root {
+            /* 기본 다크 테마 색상 (블루 포인트) */
+            --bg-gradient: linear-gradient(-45deg, #000000, #121212, #0a0a0a, #1a1a1a);
+            --card-bg: rgba(30, 30, 30, 0.4); 
+            --card-border: rgba(255, 255, 255, 0.08);
+            --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --card-shadow-hover: 0 15px 35px rgba(0, 0, 0, 0.6);
+            --inner-bg: rgba(255, 255, 255, 0.03);
+            
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.3);
+            --dot-color: rgba(255, 255, 255, 0.07);
+            
+            /* 비밀번호 강도 색상 */
+            --pwd-weak: #ef4444;
+            --pwd-fair: #f59e0b;
+            --pwd-strong: #10b981;
+        }
+
+        /* ★ 라이트 모드 전용 색상 셋팅 (옐로우 포인트) ★ */
+        body.light-mode {
+            --bg-gradient: linear-gradient(-45deg, #e2e8f0, #cbd5e1, #f1f5f9, #e2e8f0);
+            --card-bg: rgba(255, 255, 255, 0.95); 
+            --card-border: rgba(0, 0, 0, 0.12); 
+            
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.06); 
+            --card-shadow-hover: 0 15px 35px rgba(0, 0, 0, 0.12);
+            --inner-bg: rgba(0, 0, 0, 0.04);
+            
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            /* 가독성을 고려한 고급스러운 골드/머스타드 옐로우 */
+            --accent: #ca8a04; 
+            --accent-glow: rgba(202, 138, 4, 0.15);
+            --dot-color: rgba(0, 0, 0, 0.05);
+        }
+
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; } 
+        
+        body {
+            margin: 0; padding: 0; 
+            font-family: 'Pretendard', sans-serif;
+            color: var(--text-main);
+            background: var(--bg-gradient);
+            background-size: 400% 400%;
+            animation: gradientBG 20s ease infinite; 
+            min-height: 100vh;
+            overflow: hidden; 
+            position: relative; 
+            transition: color 0.3s ease; 
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: radial-gradient(var(--dot-color) 1.5px, transparent 1.5px);
+            background-size: 35px 35px; 
+            pointer-events: none; 
+            z-index: 0;
+        }
+
+        body.unlocked { overflow-y: auto; overflow-x: hidden; }
+
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        /* --- 🌟 테마 토글 버튼 스타일 --- */
+        #theme-toggle {
+            position: fixed; top: 30px; right: 30px; z-index: 1001; 
+            background: var(--card-bg); border: 1px solid var(--card-border); color: var(--accent);
+            width: 45px; height: 45px; border-radius: 12px; cursor: pointer; backdrop-filter: blur(10px);
+            display: flex; align-items: center; justify-content: center; font-size: 1.2em;
+            transition: all 0.3s ease; box-shadow: var(--card-shadow);
+        }
+        #theme-toggle:hover { transform: scale(1.1); box-shadow: var(--card-shadow-hover); }
+
+        /* --- 🔔 전역 토스트 알림 (Toast Notification) 스타일 --- */
+        #toast-container {
+            position: fixed; top: 30px; left: 50%; transform: translateX(-50%);
+            z-index: 10000; display: flex; flex-direction: column; gap: 10px;
+            pointer-events: none; 
+        }
+        .toast {
+            background: var(--card-bg); backdrop-filter: blur(15px);
+            border: 1px solid var(--card-border); border-left: 4px solid var(--accent);
+            color: var(--text-main); font-family: 'Courier New', monospace; font-weight: bold;
+            padding: 12px 20px; border-radius: 8px; box-shadow: var(--card-shadow);
+            font-size: 0.9em; display: flex; align-items: center; gap: 10px;
+            animation: slideInDown 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards, fadeOut 0.4s ease 2.6s forwards;
+        }
+        .toast i { font-size: 1.2em; color: var(--accent); }
+        .toast.success { border-left-color: #10b981; }
+        .toast.success i { color: #10b981; }
+
+        @keyframes slideInDown { 0% { transform: translateY(-50px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeOut { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-20px); opacity: 0; } }
+
+        /* --- 인트로 화면 (커튼 효과) --- */
+        #hero {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: var(--bg-gradient); background-size: 400% 400%; animation: gradientBG 20s ease infinite; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+            z-index: 100; transition: transform 1s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+        #hero::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(var(--dot-color) 1.5px, transparent 1.5px); background-size: 35px 35px; pointer-events: none; z-index: -1; }
+        #hero.slide-up { transform: translateY(-100%); pointer-events: none; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+
+        /* ★ 좌측 상단 실시간 시스템 모니터링 위젯 (HUD 스타일) ★ */
+        .sys-monitor {
+            position: absolute; top: 40px; left: 40px;
+            background: transparent; border: none; border-left: 3px solid var(--accent); 
+            padding: 5px 0 5px 15px; font-family: 'Courier New', monospace; width: 240px; text-align: left;
+            transition: transform 0.3s ease;
+        }
+        .sys-monitor:hover { transform: translateX(5px); } 
+        
+        .sys-header { font-size: 0.9em; color: var(--accent); font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; letter-spacing: 1px; }
+        .sys-stat { font-size: 0.8em; color: var(--text-muted); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+        .sys-bar { flex: 1; height: 3px; background: var(--inner-bg); margin: 0 12px; border-radius: 2px; overflow: hidden; border: none; }
+        .sys-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.5s ease, background-color 0.5s ease; }
+        .sys-val { width: 38px; text-align: right; font-weight: bold; color: var(--text-main); }
+        .sys-status { margin-top: 15px; padding-top: 10px; font-size: 0.8em; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+        .status-dot { width: 8px; height: 8px; background: #10b981; border-radius: 50%; box-shadow: 0 0 8px #10b981; }
+        .status-dot.pulse { animation: pulseDot 1.5s infinite alternate; }
+        @keyframes pulseDot { 0% { transform: scale(0.8); opacity: 0.5; } 100% { transform: scale(1.3); opacity: 1; } }
+        @media (max-width: 800px) { .sys-monitor { display: none; } }
+
+        .hero-title { font-size: 6vw; font-weight: 900; letter-spacing: 15px; margin: 0; background: linear-gradient(to right, var(--text-main), var(--accent)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: textGlow 2.5s ease-in-out infinite alternate; }
+        .hero-subtitle { font-family: 'Courier New', monospace; color: var(--text-muted); font-size: 1.5em; margin-top: 20px; letter-spacing: 3px; min-height: 1.5em; display: inline-block; }
+        .hero-subtitle::after { content: '_'; color: var(--accent); animation: blink 1s step-start infinite; margin-left: 5px; }
+
+        @media (max-width: 800px) { .hero-title { font-size: 12vw; letter-spacing: 5px; } .hero-subtitle { font-size: 1em; } }
+        @keyframes textGlow { from { filter: drop-shadow(0 0 5px var(--accent-glow)); } to { filter: drop-shadow(0 0 20px var(--accent-glow)); } }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* --- 네비게이션 --- */
+        .cyber-nav { margin-top: 60px; display: flex; align-items: center; justify-content: center; }
+        .cyber-btn { background: var(--card-bg); border: 1px solid var(--accent); color: var(--accent); padding: 14px 26px; border-radius: 12px; font-family: 'Courier New', monospace; font-weight: bold; font-size: 0.95em; cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; gap: 8px; backdrop-filter: blur(5px); box-shadow: var(--card-shadow); }
+        .cyber-btn:hover { background: var(--accent); color: #fff; box-shadow: var(--card-shadow-hover); transform: scale(1.08); }
+        body.light-mode .cyber-btn:hover { color: #fff; }
+        .cyber-line { width: 40px; height: 2px; background: var(--accent); opacity: 0.6; }
+        @media (max-width: 800px) { .cyber-nav { flex-direction: column; margin-top: 40px; } .cyber-line { width: 2px; height: 25px; } }
+
+        /* --- 메인 컨테이너 및 벤토 카드 --- */
+        .container { max-width: 1200px; width: 92%; margin: 60px auto 120px auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; position: relative; z-index: 10; }
+        
+        .bento-card { 
+            background: var(--card-bg); backdrop-filter: blur(15px); border: 1px solid var(--card-border); 
+            border-radius: 28px; padding: 40px; transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease; 
+            display: flex; flex-direction: column; justify-content: center; opacity: 0; transform: translateY(40px); box-shadow: var(--card-shadow); 
+        }
+        .bento-card.show { opacity: 1; transform: translateY(0); }
+        .bento-card:hover { transform: translateY(-5px); box-shadow: var(--card-shadow-hover); border-color: var(--accent); }
+
+        .card-profile { grid-column: span 3; display: flex; flex-direction: row; align-items: center; gap: 50px; }
+        .card-edu { grid-column: span 3; display: flex; flex-direction: row; align-items: center; justify-content: space-between; padding: 30px 40px; }
+        .card-project { grid-column: span 2; }
+        .card-tech { grid-column: span 1; }
+        .card-exp { grid-column: span 2; } 
+        .card-pwd { grid-column: span 1; display: flex; flex-direction: column; }
+
+        @media (max-width: 800px) { .container { grid-template-columns: 1fr; margin-bottom: 120px; gap: 20px; } .card-profile, .card-edu, .card-project, .card-tech, .card-exp, .card-pwd { grid-column: span 1; } .card-profile { flex-direction: column; text-align: center; gap: 30px; } .card-edu { flex-direction: column; align-items: flex-start; gap: 15px; } }
+
+        .profile-img { width: 160px; height: 160px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent); }
+        .profile-info h1 { font-size: 3em; margin: 0 0 10px 0; font-weight: 800; }
+        .profile-info h3 { color: var(--accent); margin: 0 0 15px 0; font-family: 'Courier New', monospace; letter-spacing: -0.5px; }
+        .contact-info { display: flex; gap: 20px; color: var(--text-muted); flex-wrap: wrap; }
+        .contact-info i { color: var(--accent); }
+        .section-title { font-size: 1.1em; color: var(--text-muted); margin-top: 0; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .section-title i { color: var(--accent); }
+        
+        .item-title { font-size: 1.5em; font-weight: 700; margin-bottom: 8px; color: var(--text-main); }
+        .item-role { display: inline-block; background: var(--accent-glow); color: var(--accent); padding: 5px 12px; border-radius: 8px; font-size: 0.85em; margin-bottom: 12px; font-weight: 600; }
+        .item-desc { color: var(--text-muted); margin-bottom: 15px; line-height: 1.6; }
+        .item-date { font-size: 0.9em; color: var(--text-muted); font-family: 'Courier New', monospace; opacity: 0.6; }
+        
+        /* ★ 명확하고 직관적인 프로젝트 방문 버튼 CSS ★ */
+        .project-link-btn {
+            font-size: 0.55em; /* 제목 옆에 어울리게 크기 조절 */
+            background: var(--accent-glow);
+            color: var(--accent);
+            padding: 8px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            border: 1px solid var(--accent);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            font-family: 'Pretendard', sans-serif;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            vertical-align: middle; /* 제목과 수직 정렬 */
+            margin-left: 15px; /* 제목 텍스트와의 간격 */
+        }
+        .project-link-btn:hover {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 0 15px var(--accent-glow);
+            transform: translateY(-2px);
+        }
+        body.light-mode .project-link-btn:hover {
+            color: #fff;
+        }
+        
+        .tech-list { display: flex; flex-direction: column; gap: 15px; }
+        .tech-item { display: flex; align-items: center; gap: 15px; background: var(--inner-bg); padding: 15px 20px; border-radius: 14px; transition: background 0.2s; }
+        .tech-item:hover { background: var(--card-border); }
+        .tech-item i, .tech-item svg { font-size: 1.5em; color: var(--accent); width: 24px; display: flex; justify-content: center; }
+        
+        .exp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .exp-card { background: var(--inner-bg); padding: 25px; border-radius: 18px; border: 1px solid var(--card-border); }
+
+        /* --- 🛡️ 비밀번호 유효성 검사 스타일 --- */
+        .pwd-container { width: 100%; margin: 0 auto; }
+        .pwd-input { 
+            width: 100%; padding: 12px 15px; border-radius: 10px; 
+            border: 1px solid var(--card-border); background: var(--inner-bg); 
+            color: var(--text-main); font-family: 'Courier New', monospace; 
+            outline: none; margin-bottom: 10px; transition: all 0.3s ease; 
+        }
+        .pwd-input:focus { border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
+        
+        .pwd-meter-bg { width: 100%; height: 6px; background: var(--card-border); border-radius: 3px; overflow: hidden; margin-bottom: 15px; }
+        .pwd-meter-fill { height: 100%; width: 0%; background: var(--card-border); transition: width 0.3s ease, background-color 0.3s ease; }
+        
+        .pwd-rules { list-style: none; padding: 0; margin: 0; font-size: 0.85em; color: var(--text-muted); display: flex; flex-direction: column; gap: 8px; }
+        .pwd-rules li { display: flex; align-items: center; gap: 10px; transition: color 0.3s ease; }
+        .pwd-rules li i { width: 16px; text-align: center; }
+        .pwd-rules li.valid { color: var(--pwd-strong); font-weight: bold; }
+
+        /* 🤖 챗봇 & 🏠 홈 버튼 */
+        #chatbot-container, #home-btn { position: fixed; bottom: 30px; z-index: 1000; }
+        #chatbot-container { right: 30px; }
+        #home-btn { left: 30px; background: var(--card-bg); border: 1px solid var(--accent); color: var(--accent); width: 50px; height: 50px; border-radius: 50%; font-size: 1.2em; cursor: pointer; backdrop-filter: blur(5px); transition: all 0.4s; opacity: 0; transform: translateY(40px) scale(0.5); pointer-events: none; display: flex; align-items: center; justify-content: center; box-shadow: var(--card-shadow); }
+        #home-btn.visible { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+        #home-btn:hover { background: var(--accent); color: #fff; box-shadow: var(--card-shadow-hover); transform: scale(1.15); }
+        body.light-mode #home-btn:hover { color: #fff; }
+        
+        #chat-fab { background: var(--accent); color: #fff; border: none; width: 60px; height: 60px; border-radius: 50%; font-size: 1.6em; cursor: pointer; box-shadow: 0 0 20px var(--accent-glow); transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+        #chat-window { width: 360px; height: 520px; background: var(--card-bg); backdrop-filter: blur(25px); border: 1px solid var(--card-border); border-radius: 20px; position: absolute; bottom: 80px; right: 0; display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--card-shadow-hover); transition: 0.3s; transform: scale(0); opacity: 0; transform-origin: bottom right; visibility: hidden; }
+        #chat-window.open { transform: scale(1); opacity: 1; visibility: visible; }
+        
+        .chat-header { background: var(--accent-glow); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; font-weight: 700; border-bottom: 1px solid var(--card-border); }
+        .chat-header span { color: var(--accent); font-family: 'Courier New', monospace; }
+        .close-btn { background: transparent; border: none; color: var(--text-muted); font-size: 1.5em; cursor: pointer; transition: color 0.2s; }
+        .close-btn:hover { color: var(--text-main); }
+        
+        .chat-body { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        .message { padding: 12px 16px; border-radius: 12px; max-width: 85%; font-size: 0.95em; line-height: 1.5; }
+        .bot-msg { background: var(--inner-bg); border: 1px solid var(--card-border); color: var(--text-main); align-self: flex-start; border-top-left-radius: 2px;}
+        .user-msg { background: var(--accent); color: #fff; align-self: flex-end; border-top-right-radius: 2px;}
+        
+        .tarot-result { text-align: center; margin-bottom: 8px; }
+        .tarot-result .icon { font-size: 2.5em; display: block; margin-bottom: 5px; }
+        .tarot-result .name { color: var(--accent); font-weight: 700; font-size: 1.1em; display: block; margin-bottom: 10px; }
+        .tarot-promo { font-size: 0.85em; color: var(--text-muted); border-top: 1px dashed var(--card-border); margin-top: 12px; padding-top: 12px; line-height: 1.5; }
+        
+        .chat-footer { padding: 15px; border-top: 1px solid var(--card-border); background: var(--inner-bg); }
+        .quick-replies { display: flex; flex-direction: column; gap: 8px; max-height: 120px; overflow-y: auto; padding-right: 5px; }
+        .quick-replies::-webkit-scrollbar, .chat-body::-webkit-scrollbar { width: 5px; }
+        .quick-replies::-webkit-scrollbar-thumb, .chat-body::-webkit-scrollbar-thumb { background: var(--accent-glow); border-radius: 3px; }
+        
+        .reply-btn { background: transparent; color: var(--accent); border: 1px solid var(--accent); padding: 10px 14px; border-radius: 10px; font-size: 0.9em; cursor: pointer; transition: all 0.2s ease; text-align: left; width: 100%; font-weight: bold; }
+        .reply-btn:hover { background: var(--accent-glow); box-shadow: 0 0 10px var(--accent-glow); }
+        
+        @keyframes highlightPulse {
+            0% { border-color: var(--accent); box-shadow: 0 0 30px var(--accent-glow); transform: scale(1.02); }
+            50% { border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); transform: scale(1.02); }
+            100% { border-color: var(--card-border); box-shadow: var(--card-shadow); transform: scale(1); }
+        }
+        .highlight-target { animation: highlightPulse 2s ease-out; z-index: 5; position: relative; }
+    </style>
+</head>
+<body>
+
+    <!-- 🔔 토스트 알림 컨테이너 -->
+    <div id="toast-container"></div>
+
+    <!-- 🌓 테마 토글 버튼 -->
+    <button id="theme-toggle" aria-label="테마 변경">
+        <i class="fa-solid fa-moon"></i>
+    </button>
+
+    <!-- 🌟 인트로 화면 -->
+    <header id="hero">
+        
+        <!-- ★ 실시간 시스템 모니터링 (HUD 스타일) ★ -->
+        <div class="sys-monitor" id="sys-monitor">
+            <div class="sys-header"><i class="fa-solid fa-server"></i> SYS_MONITOR</div>
+            
+            <div class="sys-stat">
+                <span>CPU Usage</span>
+                <div class="sys-bar"><div class="sys-fill cpu-fill" id="cpu-bar"></div></div>
+                <span class="sys-val" id="cpu-val">0%</span>
+            </div>
+            
+            <div class="sys-stat">
+                <span>Memory</span>
+                <div class="sys-bar"><div class="sys-fill mem-fill" id="mem-bar"></div></div>
+                <span class="sys-val" id="mem-val">0GB</span>
+            </div>
+            
+            <div class="sys-status">
+                <span class="status-dot pulse"></span> 
+                Spring Server: <span style="color: #10b981; font-weight: bold;">Standby</span>
+            </div>
+        </div>
+
+        <h1 class="hero-title">PORTFOLIO</h1>
+        <p class="hero-subtitle" id="typing-text"></p>
+        <nav class="cyber-nav">
+            <button class="cyber-btn" onclick="unlockPortfolio('section-edu')"><i class="fa-solid fa-graduation-cap"></i> Education</button>
+            <div class="cyber-line"></div>
+            <button class="cyber-btn" onclick="unlockPortfolio('section-project')"><i class="fa-solid fa-laptop-code"></i> Project</button>
+            <div class="cyber-line"></div>
+            <button class="cyber-btn" onclick="unlockPortfolio('section-tech')"><i class="fa-solid fa-code"></i> Tech Stack</button>
+            <div class="cyber-line"></div>
+            <button class="cyber-btn" onclick="unlockPortfolio('section-exp')"><i class="fa-solid fa-briefcase"></i> Experience</button>
+        </nav>
+    </header>
+
+    <!-- 메인 콘텐츠 -->
+    <main class="container" id="main-content">
+        <article class="bento-card card-profile" id="section-profile">
+            <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png" alt="윤태훈" class="profile-img">
+            <div class="profile-info">
+                <h1>윤태훈</h1>
+                <h3>&gt; WEAVING AI &amp; BACKEND WITH DILIGENCE_</h3>
+                <div class="contact-info">
+                    <p><i class="fa-solid fa-graduation-cap"></i> 컴퓨터공학과</p>
+                    <p><i class="fa-solid fa-phone"></i> 010-3339-4685</p>
+                    <p><i class="fa-solid fa-envelope"></i> yunt3209@gmail.com</p>
+                </div>
+            </div>
+        </article>
+
+        <article class="bento-card card-edu" id="section-edu">
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <div style="background: var(--accent-glow); padding: 15px; border-radius: 14px;"><i class="fa-solid fa-building-columns" style="font-size: 1.5em; color: var(--accent);"></i></div>
+                <div><div class="item-title">한라대학교</div><span class="item-role">컴퓨터공학과 졸업</span></div>
+            </div>
+            <span class="item-date">// 2021 ~ 2026</span>
+        </article>
+
+        <section class="bento-card card-project" id="section-project">
+            <h2 class="section-title"><i class="fa-solid fa-laptop-code"></i> Main Project</h2>
+            
+            <!-- ★ 직관적인 버튼 형태로 변경된 프로젝트 타이틀 ★ -->
+            <div class="item-title" style="display: flex; align-items: center;">
+                <span>클로토의 실</span>
+                <a href="https://clothos-thread.vercel.app/" target="_blank" rel="noopener noreferrer" class="project-link-btn">
+                    <i class="fa-solid fa-globe"></i> 사이트 방문
+                </a>
+            </div>
+            
+            <span class="item-role">Backend &amp; AI Integration</span>
+            <p class="item-desc">컴퓨터공학과 1년 장기 졸업 작품입니다. AI를 활용한 맞춤형 타로 해석 플랫폼의 서버 아키텍처와 모델 연동을 담당하고 있습니다.</p>
+            <span class="item-date">// 2025.12 ~ 2026.02 (Expected)</span>
+        </section>
+
+        <section class="bento-card card-tech" id="section-tech">
+            <h2 class="section-title"><i class="fa-solid fa-code"></i> Tech Stack</h2>
+            <div class="tech-list">
+                <div class="tech-item"><i class="fa-brands fa-java"></i><span>Java</span></div>
+                <div class="tech-item"><i class="fa-brands fa-python"></i><span>Python</span></div>
+                <div class="tech-item"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 1L24 22H0L12 1Z"/></svg><span>Vercel</span></div>
+            </div>
+        </section>
+
+        <section class="bento-card card-exp" id="section-exp">
+            <h2 class="section-title"><i class="fa-solid fa-briefcase"></i> Experience</h2>
+            <div class="exp-grid">
+                <div class="exp-card"><div class="item-title">네오바이오텍</div><span class="item-role">국내물류팀 인턴</span></div>
+                <div class="exp-card"><div class="item-title">원주종합사회복지관</div><span class="item-role">실습 및 인턴십</span></div>
+            </div>
+        </section>
+
+        <!-- 🛡️ 비밀번호 유효성 검사 벤토 카드 -->
+        <section class="bento-card card-pwd" id="section-pwd">
+            <h2 class="section-title" style="justify-content: center; margin-bottom: 20px;">
+                <i class="fa-solid fa-shield-halved"></i> Form Validation
+            </h2>
+            
+            <div class="pwd-container">
+                <input type="password" id="pwd-input" placeholder="비밀번호 입력 테스트..." class="pwd-input" autocomplete="off">
+                
+                <div class="pwd-meter-bg">
+                    <div class="pwd-meter-fill" id="pwd-meter"></div>
+                </div>
+                
+                <ul class="pwd-rules">
+                    <li id="rule-len"><i class="fa-solid fa-xmark"></i> 8자 이상 입력</li>
+                    <li id="rule-upper"><i class="fa-solid fa-xmark"></i> 대문자 포함 (A-Z)</li>
+                    <li id="rule-num"><i class="fa-solid fa-xmark"></i> 숫자 포함 (0-9)</li>
+                    <li id="rule-spec"><i class="fa-solid fa-xmark"></i> 특수문자 포함 (!@#등)</li>
+                </ul>
+            </div>
+            
+            <p style="font-size: 0.8em; color: var(--text-muted); text-align: center; margin-top: 15px;">
+                * JS 정규표현식(Regex) 실시간 검증
+            </p>
+        </section>
+
+    </main>
+
+    <button id="home-btn" onclick="lockPortfolio()"><i class="fa-solid fa-arrow-up"></i></button>
+
+    <aside id="chatbot-container">
+        <div id="chat-window" class="hidden">
+            <header class="chat-header">
+                <span>Yunt_Bot v1.0</span>
+                <button class="close-btn" id="close-chat-btn" aria-label="채팅창 닫기">&times;</button>
+            </header>
+            <div class="chat-body" id="chat-messages">
+                <div class="message bot-msg">안녕하세요! 예비 개발자 윤태훈의 가상 비서입니다. 제게 무엇이든 물어보세요! 🚀</div>
+            </div>
+            
+            <footer class="chat-footer">
+                <div class="quick-replies" id="quick-replies-container">
+                    <button class="reply-btn" data-type="tarot">🔮 오늘의 타로 (1장 뽑기)</button>
+                    <button class="reply-btn" data-type="intro">👋 자기소개</button>
+                    <button class="reply-btn" data-type="tech">💻 기술 스택</button>
+                    <button class="reply-btn" data-type="project">🕸️ 클로토의 실</button>
+                    <button class="reply-btn" data-type="teamwork">🤝 협업 스타일</button>
+                    <button class="reply-btn" data-type="intern">🏢 인턴 경험</button>
+                    <button class="reply-btn" data-type="goal">🎯 앞으로의 목표</button>
+                    <button class="reply-btn" data-type="contact">📬 연락처</button>
+                </div>
+            </footer>
+        </div>
+        <button id="chat-fab" aria-label="채팅 봇 열기">
+            <i class="fa-solid fa-robot pulse" aria-hidden="true"></i>
+        </button>
+    </aside>
+
+    <script>
+        /* --- 1. 전역 토스트 알림 (Toast) 함수 --- */
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            let iconClass = 'fa-solid fa-circle-info';
+            if (type === 'success') iconClass = 'fa-solid fa-circle-check';
+            
+            toast.innerHTML = `<i class="${iconClass}"></i> <span>${message}</span>`;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                if (container.contains(toast)) {
+                    container.removeChild(toast);
+                }
+            }, 3000);
+        }
+
+        /* --- 2. 테마 토글 로직 --- */
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = themeToggle.querySelector('i');
+        
+        const savedTheme = localStorage.getItem('portfolio-theme') || 'dark';
+        if (savedTheme === 'light') { document.body.classList.add('light-mode'); themeIcon.classList.replace('fa-moon', 'fa-sun'); }
+
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            if (isLight) { 
+                themeIcon.classList.replace('fa-moon', 'fa-sun'); 
+                localStorage.setItem('portfolio-theme', 'light');
+                showToast('라이트 모드로 전환되었습니다.', 'info'); 
+            } else { 
+                themeIcon.classList.replace('fa-sun', 'fa-moon'); 
+                localStorage.setItem('portfolio-theme', 'dark'); 
+                showToast('다크 모드로 전환되었습니다.', 'info');
+            }
+        });
+
+        /* --- 3. 커튼 효과 및 타이핑 애니메이션 --- */
+        window.addEventListener('beforeunload', () => { window.scrollTo(0, 0); });
+        let isUnlocked = false;
+
+        function unlockPortfolio(targetId = null) {
+            if (!isUnlocked) {
+                isUnlocked = true;
+                document.getElementById('hero').classList.add('slide-up');
+                document.body.classList.add('unlocked');
+                document.getElementById('home-btn').classList.add('visible');
+            }
+            if (targetId) {
+                setTimeout(() => {
+                    const el = document.getElementById(targetId);
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    el.classList.remove('highlight-target'); void el.offsetWidth; el.classList.add('highlight-target');
+                }, 800);
+            }
+        }
+
+        function lockPortfolio() {
+            isUnlocked = false;
+            document.getElementById('hero').classList.remove('slide-up');
+            document.body.classList.remove('unlocked');
+            document.getElementById('home-btn').classList.remove('visible');
+            setTimeout(() => window.scrollTo(0, 0), 1000);
+        }
+
+        document.getElementById('hero').addEventListener('wheel', (e) => { if (e.deltaY > 0) unlockPortfolio(); });
+
+        /* --- 4. 시스템 모니터링 수치 시뮬레이션 --- */
+        function initSysMonitor() {
+            const cpuBar = document.getElementById('cpu-bar');
+            const cpuVal = document.getElementById('cpu-val');
+            const memBar = document.getElementById('mem-bar');
+            const memVal = document.getElementById('mem-val');
+            
+            if(!cpuBar) return;
+
+            cpuBar.style.width = '12%'; cpuVal.textContent = '12%';
+            memBar.style.width = '35%'; memVal.textContent = '2.8GB';
+
+            setInterval(() => {
+                const cpuUsage = Math.floor(Math.random() * 30) + 5;
+                cpuBar.style.width = cpuUsage + '%';
+                cpuVal.textContent = cpuUsage + '%';
+                
+                if(cpuUsage > 25) cpuBar.style.backgroundColor = '#f59e0b';
+                else cpuBar.style.backgroundColor = 'var(--accent)';
+
+                const memUsage = (Math.random() * 1.7 + 2.1).toFixed(1);
+                const memPercent = Math.floor((memUsage / 8.0) * 100); 
+                memBar.style.width = memPercent + '%';
+                memVal.textContent = memUsage + 'GB';
+            }, 2000);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const typingElement = document.getElementById('typing-text');
+            const text = "Yoon Tae-hoon | Software Engineer";
+            let idx = 0;
+            function type() { if (idx < text.length) { typingElement.textContent += text[idx++]; setTimeout(type, Math.random() * 100 + 50); } }
+            setTimeout(type, 800);
+
+            initSysMonitor();
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, i) => { if (entry.isIntersecting) { setTimeout(() => entry.target.classList.add('show'), i * 100); observer.unobserve(entry.target); }});
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.bento-card').forEach(card => observer.observe(card));
+        });
+
+        /* --- 5. 폼 유효성 검사 --- */
+        const pwdInput = document.getElementById('pwd-input');
+        const meterFill = document.getElementById('pwd-meter');
+        const ruleElements = { len: document.getElementById('rule-len'), upper: document.getElementById('rule-upper'), num: document.getElementById('rule-num'), spec: document.getElementById('rule-spec') };
+        
+        let pwdSuccessNotified = false; 
+
+        if (pwdInput) {
+            pwdInput.addEventListener('input', (e) => {
+                const val = e.target.value;
+                let score = 0;
+                const checks = { len: val.length >= 8, upper: /[A-Z]/.test(val), num: /[0-9]/.test(val), spec: /[^A-Za-z0-9]/.test(val) };
+
+                for (const key in checks) {
+                    const li = ruleElements[key];
+                    const icon = li.querySelector('i');
+                    if (checks[key]) { li.classList.add('valid'); icon.className = 'fa-solid fa-check'; score += 25; } 
+                    else { li.classList.remove('valid'); icon.className = 'fa-solid fa-xmark'; }
+                }
+
+                meterFill.style.width = score + '%';
+                const style = getComputedStyle(document.body);
+                if (score === 0) { 
+                    meterFill.style.backgroundColor = 'transparent'; 
+                } else if (score <= 50) { 
+                    meterFill.style.backgroundColor = style.getPropertyValue('--pwd-weak').trim(); 
+                } else if (score <= 75) { 
+                    meterFill.style.backgroundColor = style.getPropertyValue('--pwd-fair').trim(); 
+                } else { 
+                    meterFill.style.backgroundColor = style.getPropertyValue('--pwd-strong').trim(); 
+                }
+
+                if (score === 100 && !pwdSuccessNotified) {
+                    showToast('강력한 보안 수준의 비밀번호입니다!', 'success');
+                    pwdSuccessNotified = true;
+                } else if (score < 100) {
+                    pwdSuccessNotified = false; 
+                }
+            });
+        }
+
+        /* --- 6. 챗봇 로직 --- */
+        const chatWindow = document.getElementById('chat-window');
+        const chatFab = document.getElementById('chat-fab');
+        const closeChatBtn = document.getElementById('close-chat-btn');
+        const chatMessages = document.getElementById('chat-messages');
+        const replyButtons = document.querySelectorAll('.reply-btn');
+
+        const toggleChat = () => chatWindow.classList.toggle('open');
+        chatFab.addEventListener('click', toggleChat);
+        closeChatBtn.addEventListener('click', toggleChat);
+
+        const botData = {
+            intro: { req: "태훈님에 대해 짧게 소개해 줘!", res: "성실함을 무기로 끊임없이 배우고 성장하는 예비 개발자 윤태훈입니다. 한라대학교 컴퓨터공학과에서 AI와 백엔드에 매료되어 치열하게 연구하고 있습니다." },
+            tech: { req: "주로 다루는 기술은 뭐야?", res: "핵심 기술은 Java와 Python입니다. 이번 졸업 작품에서는 Vercel을 활용해 서버를 성공적으로 구축하고 AI 연동을 구현했습니다." },
+            project: { req: "'클로토의 실' 프로젝트가 궁금해.", res: "1년 장기 프로젝트로 진행 중인 'AI 타로 카드 앱'입니다. 저는 여기서 핵심인 서버 구축과 AI 모델 연동을 맡아, 기술로 사용자에게 즐거움을 주는 훈련을 하고 있습니다." },
+            teamwork: { req: "팀 프로젝트에서 협업 스타일은 어때?", res: "두 번의 실무 인턴십을 거치며 '원활한 소통'과 '책임감'을 배웠습니다. '클로토의 실' 팀에서도 제가 맡은 백엔드 및 AI 연동 파트의 진행 상황을 투명하게 공유하여 팀에 신뢰를 주는 조율자 역할을 하고 있습니다." },
+            intern: { req: "인턴십에서는 어떤 일을 했어?", res: "네오바이오텍 국내물류팀과 원주종합사회복지관 등에서 인턴 및 실습을 진행하며 실무 감각과 책임감을 길렀습니다. 현장 상황을 파악하고 다양한 직군과 협력하는 법을 배운 값진 시간이었습니다." },
+            goal: { req: "앞으로의 목표가 뭐야?", res: "단기적으로는 이번 학기에 '정보처리기사' 자격증을 취득해 전공 지식을 탄탄히 다지는 것입니다. 장기적으로는 시스템을 안정적으로 뒷받침하는 신뢰받는 백엔드 엔지니어가 되고 싶습니다!" },
+            contact: { req: "연락처를 알 수 있을까?", res: "언제든지 아래로 연락해 주세요!<br><br>📞 010-3339-4685<br>✉️ yunt3209@gmail.com" }
+        };
+
+        const tarotDeck = [
+            { icon: "🃏", name: "0. The Fool (바보)", meaning: "새로운 시작과 무한한 가능성을 의미합니다! 오늘 예상치 못한 에러를 만나더라도, 그것이 당신을 한 단계 성장시킬 훌륭한 배움의 기회가 될 것입니다." },
+            { icon: "🧙‍♂️", name: "I. The Magician (마법사)", meaning: "창조와 능력을 상징합니다. 당신의 코드에 마법 같은 일이 일어날 수 있습니다. 며칠째 풀리지 않던 로직이 오늘 순식간에 해결될지도 몰라요!" },
+            { icon: "🌟", name: "XVII. The Star (별)", meaning: "희망과 영감을 나타냅니다. 새로운 아이디어가 번뜩이는 하루! 기획 중인 프로젝트나 개발에 있어 주변을 놀라게 할 멋진 영감이 찾아올 것입니다." },
+            { icon: "☀️", name: "XIX. The Sun (태양)", meaning: "성공과 긍정의 에너지가 가득합니다. 마치 모든 테스트 코드가 단번에 통과(All Green)될 것 같은 맑은 날이네요. 막힘없는 쾌조의 타이핑이 예상됩니다!" },
+            { icon: "🎡", name: "X. Wheel of Fortune (운명의 수레바퀴)", meaning: "긍정적인 전환점과 행운을 뜻합니다. 우연한 기회로 완벽한 오픈소스 레퍼런스를 발견하거나, 개발에 도움을 줄 귀인을 만날 수 있습니다." }
+        ];
+
+        let isTyping = false;
+
+        replyButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                if (isTyping) return;
+                
+                const type = e.target.getAttribute('data-type');
+                let reqMessage = "";
+                let resMessage = "";
+
+                if (type === 'tarot') {
+                    reqMessage = "오늘의 타로 카드 한 장 뽑아줘!";
+                    const randomCard = tarotDeck[Math.floor(Math.random() * tarotDeck.length)];
+                    resMessage = `
+                        <div class="tarot-result">
+                            <span class="icon">${randomCard.icon}</span>
+                            <span class="name">${randomCard.name}</span>
+                        </div>
+                        <p>${randomCard.meaning}</p>
+                        <div class="tarot-promo">
+                            💡 제 졸업작품 <strong>'클로토의 실'</strong>에서는 AI가 여러분의 상황에 맞춰 훨씬 더 정교하고 깊은 타로 해석을 제공해 드립니다!
+                        </div>
+                    `;
+                } else {
+                    const data = botData[type];
+                    if (!data) return;
+                    reqMessage = data.req;
+                    resMessage = data.res;
+                }
+
+                isTyping = true;
+                
+                const userMsgDiv = document.createElement('div');
+                userMsgDiv.className = 'message user-msg';
+                userMsgDiv.textContent = reqMessage;
+                chatMessages.appendChild(userMsgDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                const typingDiv = document.createElement('div');
+                typingDiv.className = 'message bot-msg';
+                typingDiv.innerHTML = type === 'tarot' ? '<i class="fa-solid fa-ellipsis"></i> 카드를 섞는 중...' : '<i class="fa-solid fa-ellipsis"></i> 입력 중...';
+                chatMessages.appendChild(typingDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                setTimeout(() => {
+                    chatMessages.removeChild(typingDiv); 
+                    const botMsgDiv = document.createElement('div');
+                    botMsgDiv.className = 'message bot-msg';
+                    botMsgDiv.innerHTML = resMessage;
+                    chatMessages.appendChild(botMsgDiv);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                    isTyping = false;
+                    
+                    if(type === 'tarot') {
+                        showToast('새로운 타로 카드가 해석되었습니다.', 'success');
+                    }
+                }, type === 'tarot' ? 1200 : 800); 
+            });
+        });
+    </script>
+</body>
+</html>
